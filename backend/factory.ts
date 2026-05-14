@@ -1,9 +1,7 @@
 import { ChatGoogle } from '@langchain/google';
 import { ChatOpenRouter } from '@langchain/openrouter';
 import { ChatOllama } from '@langchain/ollama';
-import { ProxyAgent, setGlobalDispatcher } from 'undici';
 
-const USE_PROXY = (process.env.USE_PROXY as string) === 'true';
 type dynamicLLM = {
   basic: ChatOpenRouter | ChatOllama | ChatGoogle;
   pro: ChatOpenRouter | ChatOllama | ChatGoogle;
@@ -27,14 +25,6 @@ function llmFactory(): dynamicLLM {
         })
       };
     case 'google':
-      if (USE_PROXY) {
-        // 让Google模型走代理，解决国内访问问题
-        const PROXY_AGENT = new ProxyAgent(process.env.HTTPS_PROXY as string);
-        setGlobalDispatcher(PROXY_AGENT);
-        console.log(
-          `Proxy agent ${process.env.HTTPS_PROXY} set for Google provider`
-        );
-      }
       return {
         basic: new ChatGoogle({
           model: process.env.GOOGLE_MODEL as string,
@@ -46,14 +36,6 @@ function llmFactory(): dynamicLLM {
         })
       };
     case 'openrouter':
-      if (USE_PROXY) {
-        // 让OpenRouter模型走代理，解决国内访问问题
-        const PROXY_AGENT = new ProxyAgent(process.env.HTTPS_PROXY as string);
-        setGlobalDispatcher(PROXY_AGENT);
-        console.log(
-          `Proxy agent ${process.env.HTTPS_PROXY} set for OpenRouter provider`
-        );
-      }
     default:
       return {
         basic: new ChatOpenRouter({
