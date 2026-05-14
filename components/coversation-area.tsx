@@ -42,12 +42,31 @@ export default function ConversationArea() {
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = decoder.decode(value);
-          const lines = chunk.split('\n').filter((line) => line.trim() !== '');
-          for (const line of lines) {
+          const lines = chunk
+            .split('\n\n')
+            .filter((line) => line.trim() !== '');
+          for (const rawEvent of lines) {
             try {
-              const parsed = JSON.parse(line);
-              if (parsed.type === 'token') {
-                assistantMessage.content += parsed.text.kwargs.content!;
+              // parse sse的id，event，data
+              const fields = rawEvent.split('\n');
+              let event = 'message';
+              let id = '';
+              const dataLines: string[] = [];
+
+              for (const field of fields) {
+                if (field.startsWith('event:')) {
+                  event = field.slice(6).trim();
+                } else if (field.startsWith('id:')) {
+                  id = field.slice(3).trim();
+                } else if (field.startsWith('data:')) {
+                  dataLines.push(field.slice(5).trim());
+                }
+              }
+              const dataText = dataLines.join('\n');
+              const data = dataText ? JSON.parse(dataText) : null;
+
+              if (event === 'token' && typeof data === 'string') {
+                assistantMessage.content += data;
                 setMessages((prevMessages) => {
                   const lastMessage = prevMessages[prevMessages.length - 1];
                   if (lastMessage && lastMessage.role === 'assistant') {
@@ -56,11 +75,11 @@ export default function ConversationArea() {
                     return [...prevMessages, assistantMessage];
                   }
                 });
-              } else if (parsed.type === 'done') {
-                // 处理完成
-              } else if (parsed.type === 'error') {
-                // 处理错误
-                console.error('Error from server:', JSON.stringify(parsed));
+              } else if (event === 'error') {
+                console.error('SSE error event:', { id, event, data });
+                break;
+              } else if (event === 'done') {
+                break;
               }
             } catch (error) {
               console.error('Failed to parse chunk:', chunk, error);

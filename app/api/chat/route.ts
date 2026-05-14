@@ -33,19 +33,24 @@ export async function POST(request: Request) {
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
+      let _id = 0;
       try {
         for await (const chunk of chat(message)) {
-          controller.enqueue(encoder.encode(`${JSON.stringify(chunk)}\n`));
+          controller.enqueue(
+            encoder.encode(
+              `id:${_id++}\nevent:${chunk.type}\ndata:${JSON.stringify(chunk.text.content) || ''}\n\n`
+            )
+          );
         }
         controller.enqueue(
-          encoder.encode(`${JSON.stringify({ type: 'done' })}\n`)
+          encoder.encode(`id:${_id++}\nevent:done\ndata:\n\n`)
         );
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
         controller.enqueue(
           encoder.encode(
-            `${JSON.stringify({ type: 'error', message: errorMessage })}\n`
+            `id:${_id++}\nevent:error\ndata:${JSON.stringify(errorMessage)}\n\n`
           )
         );
       } finally {
