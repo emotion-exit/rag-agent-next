@@ -59,19 +59,16 @@ async function* chat(userPrompt: string) {
       ]
     },
     {
-      streamMode: 'messages',
+      streamMode: ['messages', 'custom'],
       configurable: {
         thread_id: 'great-gatsby-lc'
       }
     }
   );
 
-  for await (const [token, metadata] of stream) {
-    yield {
-      type: 'token',
-      text: token,
-      metadata
-    };
+  for await (const chunk of stream) {
+    console.log('Received chunk from agent:', chunk);
+    yield chunk;
   }
 }
 
