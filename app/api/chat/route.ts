@@ -1,4 +1,5 @@
-import { chat } from '../../../backend/agent';
+import { chat } from '@/backend/agent';
+import type { ChatStreamEvent } from '@/types/base';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,20 +37,11 @@ export async function POST(request: Request) {
       let _id = 0;
       try {
         for await (const chunk of chat(message)) {
-          if (chunk.type === 'messages') {
-            controller.enqueue(
-              encoder.encode(
-                `id:${_id++}\nevent:${chunk.type}\ndata:${JSON.stringify((chunk as { data: () => { content: string } }).data().content)}\n\n`
-              )
-            );
-          }
-          if (chunk.type === 'custom') {
-            controller.enqueue(
-              encoder.encode(
-                `id:${_id++}\nevent:${chunk.type}\ndata:${JSON.stringify(chunk.data())}\n\n`
-              )
-            );
-          }
+          controller.enqueue(
+            encoder.encode(
+              `id:${_id++}\nevent:${chunk.type}\ndata:${JSON.stringify(chunk.text)}\n\n`
+            )
+          );
         }
 
         controller.enqueue(

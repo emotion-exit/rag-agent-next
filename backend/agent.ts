@@ -1,7 +1,10 @@
-import { metadata } from './../app/page';
 import './network';
 import { createAgent, createMiddleware } from 'langchain';
 import { MemorySaver } from '@langchain/langgraph';
+import type { RawStreamThunk } from '@/types/base';
+
+// adapters
+import adapterFactory from './utils/adapters';
 
 // factory
 import { llmFactory } from './factory';
@@ -67,20 +70,16 @@ async function* chat(userPrompt: string) {
     }
   );
 
+  const adapter = adapterFactory(process.env.PROVIDER as string);
+
   for await (const chunk of stream) {
-    yield {
+    const events = adapter({
       type: chunk[0],
-      data: () => {
-        if (chunk[0] === 'messages') {
-          const [token, metadata] = chunk[1];
-          return token;
-        } else if (chunk[0] === 'custom') {
-          return chunk[1];
-        } else {
-          return null;
-        }
-      }
-    };
+      data: chunk[1]
+    } as RawStreamThunk);
+    for (const event of events) {
+      yield event;
+    }
   }
 }
 

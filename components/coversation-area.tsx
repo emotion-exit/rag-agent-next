@@ -3,9 +3,11 @@ import { Streamdown } from 'streamdown';
 import 'streamdown/styles.css';
 import { createCodePlugin } from '@streamdown/code';
 import { useState, useRef, useEffect } from 'react';
+import { ChatStreamEventType } from '@/types/base';
 type Message = {
   role: 'user' | 'assistant';
   content: string;
+  thought?: string;
 };
 const code = createCodePlugin({
   themes: ['github-light', 'github-dark'] // [light, dark]
@@ -36,7 +38,8 @@ export default function ConversationArea() {
         const decoder = new TextDecoder('utf-8');
         const assistantMessage: Message = {
           role: 'assistant',
-          content: ''
+          content: '',
+          thought: ''
         };
         while (true) {
           const { done, value } = await reader.read();
@@ -49,23 +52,35 @@ export default function ConversationArea() {
             try {
               // parse sse的id，event，data
               const fields = rawEvent.split('\n');
-              let event = 'messages';
+              let event: ChatStreamEventType = 'message_delta';
               let id = '';
               const dataLines: string[] = [];
 
               for (const field of fields) {
                 if (field.startsWith('event:')) {
-                  event = field.slice(6).trim();
+                  event = field.slice(6) as ChatStreamEventType;
                 } else if (field.startsWith('id:')) {
-                  id = field.slice(3).trim();
+                  id = field.slice(3);
                 } else if (field.startsWith('data:')) {
-                  dataLines.push(field.slice(5).trim());
+                  dataLines.push(field.slice(5));
                 }
               }
               const dataText = dataLines.join('\n');
               const data = dataText ? JSON.parse(dataText) : null;
-              if (event === 'messages' || event === 'custom') {
+              if (event === 'message_delta') {
                 assistantMessage.content += data;
+              } else if (
+                event === 'reasoning_delta' ||
+                event === 'tool_status'
+              ) {
+                assistantMessage.thought += data;
+              }
+
+              if (
+                event === 'message_delta' ||
+                event === 'reasoning_delta' ||
+                event === 'tool_status'
+              ) {
                 setMessages((prevMessages) => {
                   const lastMessage = prevMessages[prevMessages.length - 1];
                   if (lastMessage && lastMessage.role === 'assistant') {
@@ -118,19 +133,29 @@ function ChatArea({
       ref={listRef}
       className='list flex-1 overflow-y-auto  flex flex-col gap-4 p-3'>
       {messages.map((message, index) => (
-        <div
-          key={index}
-          className={`px-4 py-2 rounded ${
-            message.role === 'user'
-              ? 'max-w-[70%]  bg-gray-600 text-gray-200 self-end'
-              : 'w-[70%] bg-gray-200 text-gray-600 self-start'
-          }`}>
-          <Streamdown
-            key={index}
-            plugins={{ code }}
-            isAnimating={status === 'streaming'}>
-            {message.content}
-          </Streamdown>
+        <div key={index} className='flex flex-col gap-2'>
+          {/* 渲染推理 */}
+          {message.thought && (
+            <div className='px-4 py-2 rounded max-w-[70%] bg-yellow-100 text-yellow-800 self-start'>
+              <Streamdown isAnimating={true}>{message.thought}</Streamdown>
+            </div>
+          )}
+
+          {/* 渲染正文 */}
+          {message.content && (
+            <div
+              className={`px-4 py-2 rounded ${
+                message.role === 'user'
+                  ? 'max-w-[70%]  bg-gray-600 text-gray-200 self-end'
+                  : 'w-[70%] bg-gray-200 text-gray-600 self-start'
+              }`}>
+              <Streamdown
+                plugins={{ code }}
+                isAnimating={status === 'streaming'}>
+                {message.content}
+              </Streamdown>
+            </div>
+          )}
         </div>
       ))}
     </div>

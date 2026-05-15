@@ -16,43 +16,29 @@ function llmFactory(): dynamicLLM {
     case 'ollama':
       return {
         basic: new ChatOllama({
-          model: process.env.OLLAMA_MODEL as string,
-          think: false
+          model: process.env.OLLAMA_MODEL as string
         }),
         pro: new ChatOllama({
-          model: process.env.OLLAMA_MODEL_PRO as string,
-          think: false
+          model: process.env.OLLAMA_MODEL_PRO as string
         })
       };
     case 'google':
       return {
         basic: new ChatGoogle({
-          model: process.env.GOOGLE_MODEL as string,
-          thinkingBudget: 0
+          model: process.env.GOOGLE_MODEL as string
         }),
         pro: new ChatGoogle({
-          model: process.env.GOOGLE_MODEL_PRO as string,
-          thinkingBudget: 0
+          model: process.env.GOOGLE_MODEL_PRO as string
         })
       };
     case 'openrouter':
     default:
       return {
         basic: new ChatOpenRouter({
-          model: process.env.OPENROUTER_MODEL as string,
-          modelKwargs: {
-            reasoning: {
-              effort: 'none'
-            }
-          }
+          model: process.env.OPENROUTER_MODEL as string
         }),
         pro: new ChatOpenRouter({
-          model: process.env.OPENROUTER_MODEL_PRO as string,
-          modelKwargs: {
-            reasoning: {
-              effort: 'none'
-            }
-          }
+          model: process.env.OPENROUTER_MODEL_PRO as string
         })
       };
   }
