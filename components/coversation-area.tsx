@@ -49,7 +49,7 @@ export default function ConversationArea() {
             try {
               // parse sse的id，event，data
               const fields = rawEvent.split('\n');
-              let event = 'message';
+              let event = 'messages';
               let id = '';
               const dataLines: string[] = [];
 
@@ -64,7 +64,7 @@ export default function ConversationArea() {
               }
               const dataText = dataLines.join('\n');
               const data = dataText ? JSON.parse(dataText) : null;
-              if (event === 'token' && typeof data === 'string') {
+              if (event === 'messages' || event === 'custom') {
                 assistantMessage.content += data;
                 setMessages((prevMessages) => {
                   const lastMessage = prevMessages[prevMessages.length - 1];

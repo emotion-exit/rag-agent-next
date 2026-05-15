@@ -36,29 +36,22 @@ export async function POST(request: Request) {
       let _id = 0;
       try {
         for await (const chunk of chat(message)) {
-          if (chunk[0] === 'messages') {
-            const messages = chunk[1];
-            for await (const message of messages) {
-              for await (const delta of message.text) {
-                controller.enqueue(
-                  encoder.encode(
-                    `id:${_id++}\nevent:token\ndata:${JSON.stringify(delta)}\n\n`
-                  )
-                );
-              }
-            }
-            continue;
-          }
-          if (chunk[0] === 'custom') {
-            const data = chunk[1];
+          if (chunk.type === 'messages') {
             controller.enqueue(
               encoder.encode(
-                `id:${_id++}\nevent:custom\ndata:${JSON.stringify(data)}\n\n`
+                `id:${_id++}\nevent:${chunk.type}\ndata:${JSON.stringify((chunk as { data: () => { content: string } }).data().content)}\n\n`
               )
             );
-            continue;
+          }
+          if (chunk.type === 'custom') {
+            controller.enqueue(
+              encoder.encode(
+                `id:${_id++}\nevent:${chunk.type}\ndata:${JSON.stringify(chunk.data())}\n\n`
+              )
+            );
           }
         }
+
         controller.enqueue(
           encoder.encode(`id:${_id++}\nevent:done\ndata:\n\n`)
         );

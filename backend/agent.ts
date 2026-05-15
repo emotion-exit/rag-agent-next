@@ -1,3 +1,4 @@
+import { metadata } from './../app/page';
 import './network';
 import { createAgent, createMiddleware } from 'langchain';
 import { MemorySaver } from '@langchain/langgraph';
@@ -67,8 +68,19 @@ async function* chat(userPrompt: string) {
   );
 
   for await (const chunk of stream) {
-    console.log('Received chunk from agent:', chunk);
-    yield chunk;
+    yield {
+      type: chunk[0],
+      data: () => {
+        if (chunk[0] === 'messages') {
+          const [token, metadata] = chunk[1];
+          return token;
+        } else if (chunk[0] === 'custom') {
+          return chunk[1];
+        } else {
+          return null;
+        }
+      }
+    };
   }
 }
 
