@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       let _id = 0;
       try {
         for await (const chunk of chat(message)) {
+          console.log('Generated chunk:', chunk);
           controller.enqueue(
             encoder.encode(
               `id:${_id++}\nevent:${chunk.type}\ndata:${JSON.stringify(chunk.text.content) || ''}\n\n`

@@ -64,7 +64,6 @@ export default function ConversationArea() {
               }
               const dataText = dataLines.join('\n');
               const data = dataText ? JSON.parse(dataText) : null;
-
               if (event === 'token' && typeof data === 'string') {
                 assistantMessage.content += data;
                 setMessages((prevMessages) => {

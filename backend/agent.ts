@@ -6,31 +6,24 @@ import { MemorySaver } from '@langchain/langgraph';
 import { llmFactory } from './factory';
 
 // tools
-import extendSentence from './tools/extend-sentence';
+import libSearch from './tools/lib-search';
 
 // model
 const { basic, pro } = llmFactory();
 
 // system prompt
 const SYSTEM_PROMPT = `
-你是一个语句修饰专家，能够将用户输入的句子扩写成两条正规的书面表达。
-通过调用工具extend-sentence来完成这个任务。
+你是一个知识库问答专家，你需要根据用户的提问，结合知识库中的信息，给出准确、简洁的回答。
 要求：
-1. 你只能使用工具extend-sentence来修饰用户输入的句子，不能直接输出修饰后的句子。
-2. 必须使用中文，必须使用markdown格式。
-3. 你应该默认用户输入的句子是非正式的口语表达，你的任务是将它们修饰成正式的书面表达。
-4. 除非用户明确让你不要扩写或者修饰，你在做其他回答。
+1. 必须使用lib-search工具来查询知识库中的信息，不能直接回答用户的问题。
+2. 每次查询只能使用lib-search工具一次，查询结果必须是用户问题的直接答案，不能包含任何无关的信息。
+3. 回答必须简洁明了，避免冗长的解释和无关的信息。
 `;
 
 // memory
 const checkpointer = new MemorySaver();
 
 // middleware
-console.log('Basic model:', basic.model);
-console.log('Pro model:', pro.model);
-console.log(
-  'Use pro model firstly, and switch to basic model after 2 rounds of conversation'
-);
 const midlleware = createMiddleware({
   name: 'dynamic-llm-middleware',
   wrapModelCall(request, handler) {
@@ -49,7 +42,7 @@ const midlleware = createMiddleware({
 const agent = createAgent({
   model: pro,
   systemPrompt: SYSTEM_PROMPT,
-  tools: [extendSentence],
+  tools: [libSearch],
   checkpointer,
   middleware: [midlleware]
 });
