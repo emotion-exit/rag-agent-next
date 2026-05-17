@@ -4,7 +4,6 @@ import { useStream } from '@langchain/react';
 import { AIMessage } from '@langchain/core/messages';
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -16,10 +15,6 @@ import {
   JSONUIProvider,
   Renderer
 } from '@/app/utils/components-registry';
-import {
-  createLangChainServiceTransport,
-  getLangChainServiceUrl
-} from '@/lib/langchain-service-transport';
 
 type JSONUIElement = {
   type: string;
@@ -115,13 +110,11 @@ export default function GenerativeUI() {
   const [prompt, setPrompt] = useState(
     '帮我生成一个包含标题、评分、标签和操作按钮的商品卡片'
   );
-  const serviceUrl = getLangChainServiceUrl();
-  const transport = useMemo(
-    () => createLangChainServiceTransport(serviceUrl),
-    [serviceUrl]
-  );
+  const serviceUrl =
+    process.env.NEXT_PUBLIC_LANGCHAIN_SERVICE_URL ?? 'http://localhost:2024';
   const stream = useStream({
-    transport
+    apiUrl: serviceUrl,
+    assistantId: 'assistant-1'
   });
   const listRef = useRef<HTMLDivElement | null>(null);
 

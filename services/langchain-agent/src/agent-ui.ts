@@ -55,7 +55,7 @@ const ElementSchema = z.object({
   children: z.array(z.string())
 });
 
-const SpecSchema = z.object({
+export const SpecSchema = z.object({
   root: z.string(),
   elements: z.record(z.string(), ElementSchema)
 });
@@ -81,45 +81,6 @@ type AgentStreamPayload = {
   streamSubgraphs?: boolean;
 };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function normalizeMessage(message: unknown) {
-  if (!isRecord(message)) {
-    return message;
-  }
-
-  if (typeof message.role === 'string') {
-    return message;
-  }
-
-  if (message.type === 'human') {
-    return { role: 'user', content: message.content };
-  }
-
-  if (message.type === 'ai') {
-    return { role: 'assistant', content: message.content };
-  }
-
-  if (message.type === 'system') {
-    return { role: 'system', content: message.content };
-  }
-
-  return message;
-}
-
-function normalizeInput(input: AgentStreamPayload['input']) {
-  if (!isRecord(input) || !Array.isArray(input.messages)) {
-    return input;
-  }
-
-  return {
-    ...input,
-    messages: input.messages.map((message) => normalizeMessage(message))
-  };
-}
-
 function resolveThreadId(payload: AgentStreamPayload) {
   const threadId = payload.config?.configurable?.thread_id;
   return typeof threadId === 'string' && threadId.length > 0
@@ -128,9 +89,9 @@ function resolveThreadId(payload: AgentStreamPayload) {
 }
 
 function streamAgent(payload: AgentStreamPayload) {
-  const normalizedInput = normalizeInput(payload.input) ?? { messages: [] };
+  const input = payload.input ?? { messages: [] };
 
-  return agent.stream(normalizedInput, {
+  return agent.stream(input as Parameters<typeof agent.stream>[0], {
     ...payload.config,
     configurable: {
       ...payload.config?.configurable,
