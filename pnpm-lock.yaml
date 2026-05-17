@@ -5,6 +5,12 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@json-render/core':
+    specifier: ^0.19.0
+    version: 0.19.0(zod@4.4.3)
+  '@json-render/react':
+    specifier: ^0.19.0
+    version: 0.19.0(react@19.2.4)(zod@4.4.3)
   '@langchain/core':
     specifier: ^1.1.45
     version: 1.1.46
@@ -20,6 +26,9 @@ dependencies:
   '@langchain/openrouter':
     specifier: ^0.2.4
     version: 0.2.4(@langchain/core@1.1.46)(zod@4.4.3)
+  '@langchain/react':
+    specifier: ^1.0.2
+    version: 1.0.2(@langchain/core@1.1.46)(react-dom@19.2.4)(react@19.2.4)
   '@streamdown/code':
     specifier: ^1.1.1
     version: 1.1.1(react@19.2.4)
@@ -652,6 +661,25 @@ packages:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  /@json-render/core@0.19.0(zod@4.4.3):
+    resolution: {integrity: sha512-vvcyZ+10EDZKbEyB1J2kXOGfDaiZR2LurZGSqi2r5STHyKr+Te85DWaBxTwRGgM7U1LtIvNx85BzzjElRKoAIg==}
+    peerDependencies:
+      zod: ^4.0.0
+    dependencies:
+      zod: 4.4.3
+    dev: false
+
+  /@json-render/react@0.19.0(react@19.2.4)(zod@4.4.3):
+    resolution: {integrity: sha512-kTW6b6cSNRrlEfCUf/69SLoLn+CufC968ruge9tnQlp9pDTGG/SK8pgM541FdgwMFA4zm3s5mpM3G8rdODKc/A==}
+    peerDependencies:
+      react: ^19.2.3
+    dependencies:
+      '@json-render/core': 0.19.0(zod@4.4.3)
+      react: 19.2.4
+    transitivePeerDependencies:
+      - zod
+    dev: false
+
   /@langchain/core@1.1.46:
     resolution: {integrity: sha512-i8rDC83BpItxChCw4Lf+6tAr+k+OUcbirc5ZkrhI9ywYWmvxegUljLGOGYvtJNTbEAIFkhYIODPE5QRqyjF6sA==}
     engines: {node: '>=20'}
@@ -799,6 +827,26 @@ packages:
 
   /@langchain/protocol@0.0.15:
     resolution: {integrity: sha512-MllvbpMjqHevUm+v94M422mH7XKN+wGCvJRBVROTWBotEDOATYB4Ktk2UheYP859y9o2LlhtPek5t1T9eyfAbQ==}
+    dev: false
+
+  /@langchain/react@1.0.2(@langchain/core@1.1.46)(react-dom@19.2.4)(react@19.2.4):
+    resolution: {integrity: sha512-+95jBl1mbu3UJkVE9AN0a3bddrS6+jkEGT4EQ+an9HNS4qVERFg3DaIBSloS0VYDLB8GxKaZEnL1kGDuQaYh1Q==}
+    peerDependencies:
+      '@langchain/core': ^1.1.44
+      react: ^18 || ^19
+    dependencies:
+      '@langchain/core': 1.1.46
+      '@langchain/langgraph-sdk': 1.9.2(react-dom@19.2.4)(react@19.2.4)
+      react: 19.2.4
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+      - '@opentelemetry/exporter-trace-otlp-proto'
+      - '@opentelemetry/sdk-trace-base'
+      - openai
+      - react-dom
+      - svelte
+      - vue
+      - ws
     dev: false
 
   /@mermaid-js/parser@1.1.1:

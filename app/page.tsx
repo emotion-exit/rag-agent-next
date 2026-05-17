@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import ConversationArea from '@/components/coversation-area';
+import ConversationStage from '@/components/coversation-stage';
 
 export const metadata: Metadata = {
   title: 'index'
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <ConversationArea />
+      <ConversationStage />
     </>
   );
 }
