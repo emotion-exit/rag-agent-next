@@ -2,8 +2,8 @@ import { createAgent, createMiddleware } from 'langchain';
 import { MemorySaver } from '@langchain/langgraph';
 import { z } from 'zod';
 
-import { llmFactory } from './factory.js';
-import libSearch from './tools/lib-search.js';
+import { llmFactory } from './factory';
+import libSearch from './tools/lib-search';
 
 const { basic, pro } = llmFactory();
 

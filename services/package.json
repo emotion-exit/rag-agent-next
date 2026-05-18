@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/agent-ui.ts -p 3001",
+    "dev": "tsx watch src/agent-ui.ts -p 3001 --mode=development",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/agent-ui.js"
   },
