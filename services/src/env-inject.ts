@@ -1,7 +1,9 @@
-import { loadEnvConfig } from '@next/env';
+import nextEnv from '@next/env';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
+
+const { loadEnvConfig } = nextEnv;
 
 const packageDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
