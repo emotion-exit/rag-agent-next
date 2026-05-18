@@ -34,13 +34,19 @@ Windows PowerShell:
 
 ## 本地开发
 
-启动前端：
+同一个终端同时启动前端和独立 Agent 服务：
 
 ```bash
 pnpm dev
 ```
 
-启动独立 Agent 服务：
+只启动前端：
+
+```bash
+pnpm dev:web
+```
+
+只启动独立 Agent 服务：
 
 ```bash
 pnpm dev:agent

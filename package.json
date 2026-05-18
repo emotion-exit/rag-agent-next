@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently -k --names next,agent --prefix-colors blue,green \"pnpm run dev:web\" \"pnpm run dev:agent\"",
+    "dev:web": "next dev",
     "dev:agent": "pnpm --filter langchain-agent-service dev",
     "build:agent": "pnpm --filter langchain-agent-service build",
     "start:agent": "pnpm --filter langchain-agent-service start",
@@ -28,6 +29,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "concurrently": "^9.2.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

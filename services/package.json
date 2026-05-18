@@ -20,6 +20,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@next/env": "^16.2.6",
     "@types/node": "^20",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
