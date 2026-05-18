@@ -1,38 +1,18 @@
 {
-  "name": "frontend-nextjs",
-  "version": "0.1.0",
+  "name": "rag-agent-next-workspace",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "@langchain/core": "^1.1.45",
-    "@langchain/google": "^0.1.11",
-    "@langchain/langgraph": "^1.3.0",
-    "@langchain/ollama": "^1.2.7",
-    "@langchain/openrouter": "^0.2.4",
-    "@streamdown/code": "^1.1.1",
-    "dotenv": "^17.4.2",
-    "langchain": "^1.4.0",
-    "next": "16.2.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "streamdown": "^2.5.0",
-    "undici": "^8.2.0",
-    "zod": "^4.4.3"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.6",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "dev:frontend-generative-ui": "pnpm --dir packages/frontend-generative-ui dev",
+    "build:frontend-generative-ui": "pnpm --dir packages/frontend-generative-ui build",
+    "start:frontend-generative-ui": "pnpm --dir packages/frontend-generative-ui start",
+    "lint:frontend-generative-ui": "pnpm --dir packages/frontend-generative-ui lint",
+    "dev:backend-agent-to-ui": "pnpm --dir packages/backend-agent-to-ui dev",
+    "build:backend-agent-to-ui": "pnpm --dir packages/backend-agent-to-ui build",
+    "start:backend-agent-to-ui": "pnpm --dir packages/backend-agent-to-ui start",
+    "dev:fullstack-next-agent": "pnpm --dir packages/fullstack-next-agent dev",
+    "build:fullstack-next-agent": "pnpm --dir packages/fullstack-next-agent build",
+    "start:fullstack-next-agent": "pnpm --dir packages/fullstack-next-agent start",
+    "lint:fullstack-next-agent": "pnpm --dir packages/fullstack-next-agent lint"
   },
   "packageManager": "pnpm@8.9.2"
 }
