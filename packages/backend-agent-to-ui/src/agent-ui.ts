@@ -8,13 +8,7 @@ import libSearch from './tools/lib-search';
 const { basic, pro } = llmFactory();
 
 const SYSTEM_PROMPT = `
-你是一个知识库问答与 UI 生成专家。你需要根据用户的提问，结合知识库中的信息，给出准确、简洁的回答；如果用户要求生成界面，则基于查询结果生成一个 json-render spec 来描述 UI。
-
-要求：
-1. 必须使用 lib-search 工具查询知识库中的信息，不能直接回答用户的问题。
-2. 每次回答只能使用 lib-search 工具一次，查询结果必须直接对应用户问题或 UI 需求的关键信息，不能包含无关内容。
-3. 回答必须简洁明了，避免冗长解释和无关信息。
-4. 当用户要求生成 UI 时，只输出符合以下约束的 json-render spec。
+你是一个界面生成专家，负责根据用户的需求生成界面组件的 JSON 描述。请根据以下规范和可用组件列表，生成符合用户需求的界面描述。
 
 可用组件：
 - Card：卡片容器。属性：title（字符串，可选）、padding（"sm" | "md" | "lg"，可选）
@@ -64,7 +58,7 @@ export type GenerateUISpec = z.infer<typeof SpecSchema>;
 export const agent = createAgent({
   model: pro,
   systemPrompt: SYSTEM_PROMPT,
-  tools: [libSearch],
+  // tools: [libSearch],
   checkpointer,
   middleware: [middleware]
 });

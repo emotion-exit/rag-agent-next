@@ -2,19 +2,15 @@
 
 import { useStream } from '@langchain/react';
 import { AIMessage } from '@langchain/core/messages';
-import { useState, type FormEvent, type KeyboardEvent } from 'react';
-
+import { useState, type KeyboardEvent } from 'react';
+import type { UIElement } from '@json-render/core';
 import {
   registry,
   JSONUIProvider,
   Renderer
 } from '@/app/utils/components-registry';
 
-type JSONUIElement = {
-  type: string;
-  props: Record<string, unknown>;
-  children?: string[];
-};
+type JSONUIElement = UIElement<string, Record<string, unknown>>;
 
 type JSONUISpec = {
   root: string;
@@ -26,21 +22,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isJSONUIElement(value: unknown): value is JSONUIElement {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  if (typeof value.type !== 'string' || !isRecord(value.props)) {
-    return false;
-  }
-
-  if (value.children == null) {
-    return true;
-  }
-
   return (
-    Array.isArray(value.children) &&
-    value.children.every((child) => typeof child === 'string')
+    isRecord(value) &&
+    typeof value.type === 'string' &&
+    isRecord(value.props) &&
+    Array.isArray(value.children)
   );
 }
 
@@ -71,52 +57,80 @@ function toJSONUISpec(value: unknown): JSONUISpec | null {
   };
 }
 
+function getContentText(content: unknown): string {
+  if (typeof content === 'string') {
+    return content;
+  }
+
+  if (!Array.isArray(content)) {
+    return '';
+  }
+
+  return content
+    .map((block) => {
+      if (typeof block === 'string') {
+        return block;
+      }
+
+      if (!isRecord(block) || typeof block.text !== 'string') {
+        return '';
+      }
+
+      return block.text;
+    })
+    .join('');
+}
+
+function extractSpecFromText(text: string): JSONUISpec | null {
+  const codeBlockPattern = /```(?:json)?\s*([\s\S]*?)```/gi;
+
+  for (const match of text.matchAll(codeBlockPattern)) {
+    try {
+      const parsed = JSON.parse(match[1].trim());
+      const spec = toJSONUISpec(parsed);
+
+      if (spec) {
+        return spec;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
+
 export default function GenerativeUI() {
   const [prompt, setPrompt] = useState(
-    '帮我生成一个包含标题、评分、标签和操作按钮的商品卡片'
+    '帮我生成一个商品卡片，包含标题、评分、价格和购买按钮'
   );
   const serviceUrl = process.env.NEXT_PUBLIC_AGENT_API_URL;
   const stream = useStream({
     apiUrl: serviceUrl,
-    assistantId: 'assistant-1'
+    assistantId: 'generative_ui'
   });
 
-  const handleSubmit = async (text: string) => {
-    const nextPrompt = text.trim();
-    if (!nextPrompt) {
-      return;
-    }
-
-    await stream.submit({
-      messages: [{ type: 'human', content: nextPrompt }]
+  const handleSubmit = () => {
+    stream.submit({
+      messages: [{ type: 'human', content: prompt }]
     });
     setPrompt('');
   };
 
   const aiMessage = [...stream.messages].reverse().find(AIMessage.isInstance);
-  const rawSpec = aiMessage?.tool_calls?.[0]?.args;
-  const spec = toJSONUISpec(rawSpec);
-  const errorMessage =
-    stream.error instanceof Error
-      ? stream.error.message
-      : typeof stream.error === 'string'
-        ? stream.error
-        : null;
-
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    await handleSubmit(prompt);
-  }
+  const spec =
+    toJSONUISpec(aiMessage?.tool_calls?.[0]?.args) ??
+    extractSpecFromText(getContentText(aiMessage?.content));
 
   return (
     <div className='relative min-h-screen overflow-hidden bg-[#f6f1e8]'>
-      <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.92),_rgba(246,241,232,0.72)_42%,_rgba(228,218,200,0.96)_100%)]' />
+      <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.92),rgba(246,241,232,0.72)_42%,rgba(228,218,200,0.96)_100%)]' />
 
       <section className='relative flex min-h-screen items-center justify-center px-6 pb-40 pt-10'>
         <div className='w-full max-w-6xl'>
           {spec ? (
             <JSONUIProvider registry={registry}>
-              <div className='min-h-[70vh] rounded-[2rem] border border-black/10 bg-white/72 p-8 shadow-[0_30px_120px_rgba(66,44,22,0.12)] backdrop-blur-sm'>
+              <div className='min-h-[70vh] rounded-4xl border border-black/10 bg-white/72 p-8 shadow-[0_30px_120px_rgba(66,44,22,0.12)] backdrop-blur-sm'>
                 <Renderer
                   spec={spec}
                   registry={registry}
@@ -125,22 +139,14 @@ export default function GenerativeUI() {
               </div>
             </JSONUIProvider>
           ) : (
-            <div className='flex min-h-[70vh] items-center justify-center rounded-[2rem] border border-dashed border-black/15 bg-white/45 px-5 py-8 text-center text-sm leading-6 text-neutral-600 backdrop-blur-sm'>
+            <div className='flex min-h-[70vh] items-center justify-center rounded-4xl border border-dashed border-black/15 bg-white/45 px-5 py-8 text-center text-sm leading-6 text-neutral-600 backdrop-blur-sm'>
               生成结果会显示在这里。当前还没有拿到可渲染的 JSON UI spec。
-            </div>
-          )}
-
-          {errorMessage && (
-            <div className='mx-auto mt-4 max-w-3xl rounded-2xl border border-red-200 bg-red-50/95 px-4 py-3 text-sm text-red-700 shadow-sm'>
-              {errorMessage}
             </div>
           )}
         </div>
       </section>
 
-      <form
-        onSubmit={onSubmit}
-        className='pointer-events-none fixed inset-x-0 bottom-0 z-10 flex justify-center px-4 pb-6'>
+      <div className='pointer-events-none fixed inset-x-0 bottom-0 z-10 flex justify-center px-4 pb-6'>
         <div className='pointer-events-auto w-full max-w-3xl rounded-[1.75rem] border border-black/10 bg-white/85 p-4 shadow-[0_20px_60px_rgba(30,20,10,0.18)] backdrop-blur-md'>
           <textarea
             value={prompt}
@@ -152,7 +158,7 @@ export default function GenerativeUI() {
             onKeyDown={(event: KeyboardEvent<HTMLTextAreaElement>) => {
               if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
-                void handleSubmit(prompt);
+                void handleSubmit();
               }
             }}
           />
@@ -163,14 +169,14 @@ export default function GenerativeUI() {
             </p>
 
             <button
-              type='submit'
+              onClick={handleSubmit}
               className='rounded-full bg-neutral-950 px-5 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-neutral-300'
               disabled={stream.isLoading || prompt.trim() === ''}>
               {stream.isLoading ? '生成中...' : '生成界面'}
             </button>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
