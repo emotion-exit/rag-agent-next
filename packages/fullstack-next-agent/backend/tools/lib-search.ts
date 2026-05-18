@@ -1,31 +1,22 @@
-import fs from 'node:fs';
 import { tool, type ToolRuntime } from 'langchain';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-function resolveLibraryFilePath() {
-  const configuredPath = process.env.LIBRARY_FILE_PATH?.trim();
-  if (configuredPath) {
-    return path.resolve(configuredPath);
-  }
-
-  return fileURLToPath(new URL('../../../../db/lib.txt', import.meta.url));
-}
-
+import fs from 'fs';
+import path from 'path';
 export default tool(
-  (_input, config: ToolRuntime) => {
+  (input, config: ToolRuntime) => {
     const writer = config.writer;
+    // 流式输出tool的结果
     if (writer) {
       writer('正在查询知识库信息...\n\n');
     }
 
-    const filePath = resolveLibraryFilePath();
+    // 查询文件内容
+    const filePath = path.join(process.cwd(), 'db/lib.txt');
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf-8');
+      // 简单模拟查询，实际可以替换成真正的数据库查询逻辑
       return `这是根据用户提问查询到的知识库信息：${content}\n\n`;
     }
-
-    return '没有找到相关的知识库信息。\n\n';
+    return `没有找到相关的知识库信息。\n\n`;
   },
   {
     name: 'lib-search',

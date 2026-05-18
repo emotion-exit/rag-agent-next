@@ -1,10 +1,10 @@
 {
-  "name": "langchain-agent-service",
+  "name": "backend-agent-to-ui",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/agent-ui.ts -p 3001",
+    "dev": "langgraphjs dev -p 3001 --no-browser",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/agent-ui.js"
   },
@@ -20,6 +20,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@langchain/langgraph-cli": "^1.2.1",
     "@next/env": "^16.2.6",
     "@types/node": "^20",
     "tsx": "^4.20.6",

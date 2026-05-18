@@ -61,7 +61,7 @@ export const SpecSchema = z.object({
 
 export type GenerateUISpec = z.infer<typeof SpecSchema>;
 
-const agent = createAgent({
+export const agent = createAgent({
   model: pro,
   systemPrompt: SYSTEM_PROMPT,
   tools: [libSearch],
