@@ -19,6 +19,9 @@ const useProxy = process.env.USE_PROXY === 'true';
 
 let proxyConfigured = false;
 
+console.log(`Using provider: ${provider}`);
+console.log(`Use proxy: ${useProxy}`);
+
 function configureProxy(providerLabel: 'Google' | 'OpenRouter') {
   if (!useProxy || proxyConfigured) {
     return;

@@ -9,11 +9,11 @@ type DynamicLLM = {
   pro: ChatOpenRouter | ChatOllama | ChatGoogle;
 };
 
-console.log(`Using provider: ${provider}`);
-
 function llmFactory(): DynamicLLM {
   switch (provider) {
     case 'ollama':
+      console.log(`Using Pro Model: ${process.env.OLLAMA_MODEL_PRO}`);
+      console.log(`Using Basic Model: ${process.env.OLLAMA_MODEL}`);
       return {
         basic: new ChatOllama({
           model: process.env.OLLAMA_MODEL as string
@@ -24,6 +24,8 @@ function llmFactory(): DynamicLLM {
       };
     case 'google':
       configureProxy('Google');
+      console.log(`Using Pro Model: ${process.env.GOOGLE_MODEL_PRO}`);
+      console.log(`Using Basic Model: ${process.env.GOOGLE_MODEL}`);
       return {
         basic: new ChatGoogle({
           model: process.env.GOOGLE_MODEL as string
@@ -35,6 +37,8 @@ function llmFactory(): DynamicLLM {
     case 'openrouter':
     default:
       configureProxy('OpenRouter');
+      console.log(`Using Pro Model: ${process.env.OPENROUTER_MODEL_PRO}`);
+      console.log(`Using Basic Model: ${process.env.OPENROUTER_MODEL}`);
       return {
         basic: new ChatOpenRouter({
           model: process.env.OPENROUTER_MODEL as string
