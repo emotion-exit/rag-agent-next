@@ -1,4 +1,3 @@
-import './network.js';
 import { createAgent, createMiddleware } from 'langchain';
 import { MemorySaver } from '@langchain/langgraph';
 import { z } from 'zod';
@@ -69,37 +68,3 @@ const agent = createAgent({
   checkpointer,
   middleware: [middleware]
 });
-
-type AgentStreamPayload = {
-  input: Record<string, unknown> | null | undefined;
-  context?: Record<string, unknown>;
-  command?: unknown;
-  config?: {
-    configurable?: Record<string, unknown>;
-    [key: string]: unknown;
-  };
-  streamSubgraphs?: boolean;
-};
-
-function resolveThreadId(payload: AgentStreamPayload) {
-  const threadId = payload.config?.configurable?.thread_id;
-  return typeof threadId === 'string' && threadId.length > 0
-    ? threadId
-    : 'great-gatsby-lc';
-}
-
-function streamAgent(payload: AgentStreamPayload) {
-  const input = payload.input ?? { messages: [] };
-
-  return agent.stream(input as Parameters<typeof agent.stream>[0], {
-    ...payload.config,
-    configurable: {
-      ...payload.config?.configurable,
-      thread_id: resolveThreadId(payload)
-    },
-    streamMode: ['messages', 'updates', 'custom']
-  });
-}
-
-export { streamAgent };
-export type { AgentStreamPayload };

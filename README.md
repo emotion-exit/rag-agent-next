@@ -3,12 +3,33 @@
 当前仓库已经按 pnpm workspace 组织为一个轻量 monorepo：
 
 - 根目录：Next.js 前端
-- services/langchain-agent：独立 LangChain/Fastify 服务
+- services：独立 LangChain/Fastify 服务
 
 ## 安装依赖
 
+仓库使用 pnpm workspace 管理依赖。在根目录执行一次安装，就会同时安装：
+
+- Next.js 前端依赖
+- services 下 Agent 服务依赖
+
+直接使用 pnpm：
+
 ```bash
 pnpm install
+```
+
+也可以使用仓库内置脚本：
+
+macOS / Linux:
+
+```bash
+./install.sh
+```
+
+Windows PowerShell:
+
+```powershell
+.\install.ps1
 ```
 
 ## 本地开发

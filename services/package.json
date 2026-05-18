@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/agent-ui.ts -p 3001",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/server.js"
+    "start": "node dist/agent-ui.js"
   },
   "dependencies": {
     "@fastify/cors": "^10.1.0",
@@ -16,7 +16,6 @@
     "@langchain/ollama": "^1.2.7",
     "@langchain/openrouter": "^0.2.4",
     "dotenv": "^17.4.2",
-    "fastify": "^5.2.1",
     "langchain": "^1.4.0",
     "undici": "^8.2.0",
     "zod": "^4.4.3"
