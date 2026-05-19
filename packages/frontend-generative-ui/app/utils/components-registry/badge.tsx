@@ -1,22 +1,26 @@
+import type { CSSProperties } from 'react';
+
 export default function Badge({
   props
 }: {
   props: {
     text: string;
     variant?: 'default' | 'success' | 'warning' | 'error' | 'info';
+    styles?: Record<string, string>;
   };
 }) {
   const variantClass = {
-    default: 'bg-neutral-100 text-neutral-800',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-amber-100 text-amber-800',
-    error: 'bg-red-100 text-red-800',
-    info: 'bg-sky-100 text-sky-800'
+    default: 'border-neutral-300 text-current',
+    success: 'border-neutral-300 text-current',
+    warning: 'border-neutral-300 text-current',
+    error: 'border-neutral-300 text-current',
+    info: 'border-neutral-300 text-current'
   }[props.variant ?? 'default'];
 
   return (
     <span
-      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${variantClass}`}>
+      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs leading-4 ${variantClass}`}
+      style={props.styles as CSSProperties}>
       {props.text}
     </span>
   );

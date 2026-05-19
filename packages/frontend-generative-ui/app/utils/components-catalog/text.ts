@@ -5,7 +5,8 @@ const Text = {
   props: z.object({
     text: z.string(),
     variant: z.enum(['body', 'caption', 'label']).optional(),
-    color: z.enum(['default', 'secondary', 'muted']).optional()
+    color: z.enum(['default', 'secondary', 'muted']).optional(),
+    styles: z.record(z.string(), z.string()).optional()
   })
 };
 

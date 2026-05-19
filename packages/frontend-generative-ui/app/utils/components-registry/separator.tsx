@@ -1,8 +1,11 @@
+import type { CSSProperties } from 'react';
+
 export default function Separator({
   props
 }: {
   props: {
     margin?: 'sm' | 'md' | 'lg';
+    styles?: Record<string, string>;
   };
 }) {
   const marginClass = {
@@ -11,5 +14,10 @@ export default function Separator({
     lg: 'my-6'
   }[props.margin ?? 'md'];
 
-  return <hr className={`w-full border-neutral-200 ${marginClass}`} />;
+  return (
+    <hr
+      className={`w-full border-neutral-300 ${marginClass}`}
+      style={props.styles as CSSProperties}
+    />
+  );
 }

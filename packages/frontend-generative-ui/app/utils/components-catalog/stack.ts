@@ -6,7 +6,8 @@ const Stack = {
     .object({
       direction: z.enum(['vertical', 'horizontal']).optional(),
       gap: z.enum(['sm', 'md', 'lg']).optional(),
-      align: z.enum(['start', 'center', 'end', 'stretch']).optional()
+      align: z.enum(['start', 'center', 'end', 'stretch']).optional(),
+      styles: z.record(z.string(), z.string()).optional()
     })
     .describe('Stack组件的属性')
 };

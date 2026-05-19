@@ -6,7 +6,8 @@ const Button = {
     .object({
       label: z.string().describe('按钮上的文本'),
       variant: z.enum(['primary', 'secondary', 'ghost', 'link']).optional(),
-      fullWidth: z.boolean().optional()
+      fullWidth: z.boolean().optional(),
+      styles: z.record(z.string(), z.string()).optional()
     })
     .describe('Button组件的属性')
 };

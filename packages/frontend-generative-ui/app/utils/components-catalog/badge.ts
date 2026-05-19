@@ -6,7 +6,8 @@ const Badge = {
     text: z.string(),
     variant: z
       .enum(['default', 'success', 'warning', 'error', 'info'])
-      .optional()
+      .optional(),
+    styles: z.record(z.string(), z.string()).optional()
   })
 };
 

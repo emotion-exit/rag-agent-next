@@ -8,7 +8,8 @@ const TextInput = {
       placeholder: z.string().optional(),
       type: z
         .enum(['text', 'email', 'password', 'number', 'textarea'])
-        .optional()
+        .optional(),
+      styles: z.record(z.string(), z.string()).optional()
     })
     .describe('TextInput组件的属性')
 };

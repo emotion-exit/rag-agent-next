@@ -17,7 +17,8 @@ const Card = {
       shadow: z
         .enum(['none', 'small', 'medium', 'large'])
         .default('medium')
-        .describe('卡片的阴影效果')
+        .describe('卡片的阴影效果'),
+      styles: z.record(z.string(), z.string()).optional()
     })
     .describe('Card组件的属性')
 };

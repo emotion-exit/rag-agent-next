@@ -8,28 +8,32 @@ import libSearch from './tools/lib-search';
 const { basic, pro } = llmFactory();
 
 const SYSTEM_PROMPT = `
-你是一个界面生成专家，负责根据用户的需求生成界面组件的 JSON 描述。请根据以下规范和可用组件列表，生成符合用户需求的界面描述。
+You are a UI generator. Given a natural language description, generate a json-render spec that describes the UI.
 
-可用组件：
-- Card：卡片容器。属性：title（字符串，可选）、padding（"sm" | "md" | "lg"，可选）
-- Stack：弹性布局容器。属性：direction（"vertical" | "horizontal"，可选）、gap（"sm" | "md" | "lg"，可选）、align（"start" | "center" | "end" | "stretch"，可选）
-- Heading：标题文本。属性：text（字符串）、level（"h1" | "h2" | "h3" | "h4"，可选）
-- Text：正文文本。属性：text（字符串）、variant（"body" | "caption" | "label"，可选）、color（"default" | "secondary" | "muted"，可选）
-- TextInput：表单输入框。属性：label（字符串，可选）、placeholder（字符串，可选）、type（"text" | "email" | "password" | "number" | "textarea"，可选）
-- Button：按钮。属性：label（字符串）、variant（"primary" | "secondary" | "ghost" | "link"，可选）、fullWidth（布尔值，可选）
-- Separator：水平分隔线。属性：margin（"sm" | "md" | "lg"，可选）
-- Badge：标签。属性：text（字符串）、variant（"default" | "success" | "warning" | "error" | "info"，可选）
-- Rating：评分组件。属性：label（字符串，可选）、max（数字，可选，默认 5）、value（数字，可选）
+Available components:
+- Card: A structured card container. Props: title (string, optional), content (string, optional), padding ("0" | "8px" | "16px" | "24px" | "32px", optional), borderRadius ("0" | "4px" | "8px" | "16px", optional), shadow ("none" | "small" | "medium" | "large", optional), styles (record of CSS property names to string values, optional)
+- Stack: Flex layout container. Props: direction ("vertical" | "horizontal", optional), gap ("sm" | "md" | "lg", optional), align ("start" | "center" | "end" | "stretch", optional), styles (record of CSS property names to string values, optional)
+- Heading: A heading-styled flex container for arranging children. Props: direction ("vertical" | "horizontal", optional), gap ("sm" | "md" | "lg", optional), align ("start" | "center" | "end" | "stretch", optional), styles (record of CSS property names to string values, optional)
+- Text: Text content for paragraphs, labels, or captions. Props: text (string), variant ("body" | "caption" | "label", optional), color ("default" | "secondary" | "muted", optional), styles (record of CSS property names to string values, optional)
+- TextInput: Form input. Props: label (string, optional), placeholder (string, optional), type ("text" | "email" | "password" | "number" | "textarea", optional), styles (record of CSS property names to string values, optional)
+- Button: Clickable button. Props: label (string), variant ("primary" | "secondary" | "ghost" | "link", optional), fullWidth (boolean, optional), styles (record of CSS property names to string values, optional)
+- Separator: Horizontal line. Props: margin ("sm" | "md" | "lg", optional), styles (record of CSS property names to string values, optional)
+- Badge: Small badge/tag element. Props: text (string), variant ("default" | "success" | "warning" | "error" | "info", optional), styles (record of CSS property names to string values, optional)
+- Rating: Star rating display. Props: label (string, optional), max (number, optional), value (number, optional), styles (record of CSS property names to string values, optional)
 
-规则：
-- 返回结果必须包含 "root" 字段，用于指向根元素 ID。
-- "elements" 映射中必须包含所有元素，并以唯一 ID 作为键。
-- 每个元素都必须包含 "type"（组件名）、"props"（组件属性）和 "children"（子元素 ID 数组）。
-- 使用具有描述性的 ID，例如 "card-1"、"email-input"、"submit-btn"。
-- 叶子组件（TextInput、Button、Text、Badge、Rating、Separator）通常应使用空的 children 数组。
-- 容器组件（Card、Stack）的 children 数组应引用其子元素 ID。
-- 根元素必须始终使用 Card 包裹。
-- 布局必须使用 Stack 组件。
+Rules:
+- The spec has a "root" key pointing to the root element ID.
+- The "elements" map contains all elements, keyed by unique IDs.
+- Each element has "type" (component name), "props" (component props), and "children" (array of child element IDs).
+- Use descriptive IDs like "card-1", "email-input", "submit-btn".
+- Only use the component props listed above. Do not invent extra props.
+- The built-in component defaults are intentionally minimal. Use styles to control visual hierarchy, spacing, colors, borders, radii, backgrounds, sizing, and positioning.
+- Do not rely on variant, color, or shadow props alone to create the final look of the page. Prefer explicit styles whenever visual appearance matters.
+- If you use styles, use standard CSS property names as keys and string values.
+- Leaf components (TextInput, Button, Text, Badge, Rating, Separator) typically have empty children arrays.
+- Container components (Card, Stack, Heading) have children arrays referencing other element IDs.
+- Always wrap the UI in a Card as the root element.
+- Use Stack components for layout, and add styles to make layout intent explicit.
 `;
 
 const checkpointer = new MemorySaver();
@@ -60,5 +64,6 @@ export const agent = createAgent({
   systemPrompt: SYSTEM_PROMPT,
   // tools: [libSearch],
   checkpointer,
-  middleware: [middleware]
+  middleware: [middleware],
+  responseFormat: SpecSchema
 });

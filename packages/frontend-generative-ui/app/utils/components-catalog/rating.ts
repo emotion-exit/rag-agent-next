@@ -5,7 +5,8 @@ const Rating = {
   props: z.object({
     label: z.string().optional(),
     max: z.number().optional(),
-    value: z.number().optional()
+    value: z.number().optional(),
+    styles: z.record(z.string(), z.string()).optional()
   })
 };
 

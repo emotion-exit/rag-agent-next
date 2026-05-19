@@ -8,6 +8,9 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/agent-ui.js"
   },
+  "engines": {
+    "node": "23.x"
+  },
   "dependencies": {
     "@fastify/cors": "^10.1.0",
     "@langchain/core": "^1.1.45",

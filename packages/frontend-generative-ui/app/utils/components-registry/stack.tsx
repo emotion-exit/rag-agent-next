@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 export default function Stack({
   props,
@@ -8,6 +8,7 @@ export default function Stack({
     direction?: 'vertical' | 'horizontal';
     gap?: 'sm' | 'md' | 'lg';
     align?: 'start' | 'center' | 'end' | 'stretch';
+    styles?: Record<string, string>;
   };
   children?: ReactNode;
 }) {
@@ -28,7 +29,9 @@ export default function Stack({
   }[props.align ?? 'stretch'];
 
   return (
-    <div className={`flex ${directionClass} ${gapClass} ${alignClass}`}>
+    <div
+      className={`flex ${directionClass} ${gapClass} ${alignClass}`}
+      style={props.styles as CSSProperties}>
       {children}
     </div>
   );

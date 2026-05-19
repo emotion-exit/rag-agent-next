@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 export default function Heading({
   props,
@@ -8,6 +8,7 @@ export default function Heading({
     direction?: 'vertical' | 'horizontal';
     gap?: 'sm' | 'md' | 'lg';
     align?: 'start' | 'center' | 'end' | 'stretch';
+    styles?: Record<string, string>;
   };
   children?: ReactNode;
 }) {
@@ -29,7 +30,8 @@ export default function Heading({
 
   return (
     <div
-      className={`flex ${directionClass} ${gapClass} ${alignClass} text-xl font-semibold`}>
+      className={`flex ${directionClass} ${gapClass} ${alignClass}`}
+      style={props.styles as CSSProperties}>
       {children}
     </div>
   );

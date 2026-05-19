@@ -16,9 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html className='h-full antialiased'>
-      <body className='h-screen w-screen overflow-y-hidden px-[25%] py-20 flex flex-col items-center'>
-        {children}
-      </body>
+      <body className='h-screen w-screen overflow-hidden'>{children}</body>
     </html>
   );
 }
