@@ -7,6 +7,18 @@ type dynamicLLM = {
   pro: ChatOpenRouter | ChatOllama | ChatGoogle;
 };
 
+const googleThinkingDisabled = {
+  thinkingBudget: 0
+};
+
+const openRouterReasoningDisabled = {
+  modelKwargs: {
+    reasoning: {
+      effort: 'none'
+    }
+  }
+};
+
 const _provider = process.env.PROVIDER || 'openrouter';
 
 console.log(`Using provider: ${_provider}`);
@@ -25,20 +37,24 @@ function llmFactory(): dynamicLLM {
     case 'google':
       return {
         basic: new ChatGoogle({
-          model: process.env.GOOGLE_MODEL as string
+          model: process.env.GOOGLE_MODEL as string,
+          ...googleThinkingDisabled
         }),
         pro: new ChatGoogle({
-          model: process.env.GOOGLE_MODEL_PRO as string
+          model: process.env.GOOGLE_MODEL_PRO as string,
+          ...googleThinkingDisabled
         })
       };
     case 'openrouter':
     default:
       return {
         basic: new ChatOpenRouter({
-          model: process.env.OPENROUTER_MODEL as string
+          model: process.env.OPENROUTER_MODEL as string,
+          ...openRouterReasoningDisabled
         }),
         pro: new ChatOpenRouter({
-          model: process.env.OPENROUTER_MODEL_PRO as string
+          model: process.env.OPENROUTER_MODEL_PRO as string,
+          ...openRouterReasoningDisabled
         })
       };
   }

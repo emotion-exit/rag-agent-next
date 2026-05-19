@@ -8,9 +8,11 @@ import {
   JSONUIProvider,
   Renderer
 } from '@/app/utils/components-registry';
+import type { GenerateUISpec } from '../../backend-agent-to-ui/src/agent-ui';
+import type { UIElement } from '@json-render/core';
 
 export default function GenerativeUI() {
-  const [prompt, setPrompt] = useState('生成好看的暗黑4职业卡片');
+  const [prompt, setPrompt] = useState('生成好看的魔兽世界职业卡片');
   const serviceUrl = process.env.NEXT_PUBLIC_AGENT_API_URL;
   const stream = useStream({
     apiUrl: serviceUrl,
@@ -25,13 +27,18 @@ export default function GenerativeUI() {
   };
 
   const aiMessage = stream.messages.find(AIMessage.isInstance);
-  const rawSpec = aiMessage?.tool_calls?.[0]?.args;
+  const rawSpec = aiMessage?.tool_calls?.[0]?.args as
+    | GenerateUISpec
+    | undefined;
   const spec = (() => {
     if (!rawSpec?.root || !rawSpec?.elements) return null;
     const rootEl = rawSpec.elements[rawSpec.root];
     if (!rootEl?.type || rootEl?.props == null) return null;
 
-    const safeElements = {};
+    const safeElements: Record<
+      string,
+      UIElement<string, Record<string, unknown>>
+    > = {};
     for (const [key, el] of Object.entries(rawSpec.elements)) {
       if (el?.type && el?.props != null) {
         safeElements[key] = el;
@@ -39,6 +46,7 @@ export default function GenerativeUI() {
     }
     return { root: rawSpec.root, elements: safeElements };
   })();
+
   return (
     <div className='relative min-h-screen overflow-hidden '>
       <div
